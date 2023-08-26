@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Consumindo APIs Públicas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    h1, h2 {
+      margin-bottom: 10px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    button {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Consumindo APIs</h1>
+
+<div id="cepSection">
+  <h2>Buscar CEP</h2>
+  <label for="cepInput">Digite um CEP:</label>
+  <input type="text" id="cepInput" placeholder="Exemplo: 12345-678">
+  <button id="cepButton">Buscar Informações de CEP</button>
+  
+      <pre id="cepResult"></pre>
+
+  
+</div>
+
+<div id="catSection">
+  <h2>Fatos de gatos</h2>
+  <button id="catButton">Buscar Cat Fact</button>
+  <table>
+    <tr>
+      <th>Fato do Gato</th>
+    </tr>
+    <tr>
+      <td><pre id="catResult"></pre></td>
+    </tr>
+  </table>
+</div>
+
+<div id="pokeSection">
+  <h2>PokeAPI</h2>
+  <label for="pokeInput">Número do Pokémon:</label>
+  <input type="text" id="pokeInput">
+  <button id="pokeButton">Buscar Informações de um Pokémon</button>
+  <pre id="pokeResult"></pre>
+    
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const cepButton = document.getElementById("cepButton");
+  const cepInput = document.getElementById("cepInput");
+  const cepResult = document.getElementById("cepResult");
+
+  cepButton.addEventListener("click", () => {
+    const cep = cepInput.value.replace(/\D/g, ''); 
+    if (cep) {
+      fetch(`https://viacep.com.br/ws/${cep}/json/`)
+        .then(response => response.json())
+        .then(data => {
+          if (!data.erro) {
+            cepResult.textContent = `CEP: ${data.cep}\nLogradouro: ${data.logradouro}\nBairro: ${data.bairro}\nCidade/UF: ${data.localidade}/${data.uf}`;
+          } else {
+            cepResult.textContent = "CEP não encontrado.";
+          }
+        });
+    }
+  });
+
+  const catButton = document.getElementById("catButton");
+  const catResult = document.getElementById("catResult");
+
+  catButton.addEventListener("click", () => {
+    fetch("https://cat-fact.herokuapp.com/facts/random")
+      .then(response => response.json())
+      .then(data => {
+        catResult.textContent = data.text;
+      });
+  });
+
+  const pokeButton = document.getElementById("pokeButton");
+const pokeInput = document.getElementById("pokeInput");
+const pokeResult = document.getElementById("pokeResult");
+
+pokeButton.addEventListener("click", () => {
+  const pokemonNumber = pokeInput.value;
+  if (pokemonNumber) {
+    fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonNumber}`)
+      .then(response => response.json())
+      .then(data => {
+        const name = data.name;
+        const types = data.types.map(typeObj => typeObj.type.name).join(", ");
+        
+        pokeResult.textContent = `Nome: ${name}\nTipo(s): ${types}`;
+      })
+      .catch(error => {
+        pokeResult.textContent = "Pokémon não encontrado.";
+      });
+  }
+});
+});
+</script>
+
+</body>
+</html>
